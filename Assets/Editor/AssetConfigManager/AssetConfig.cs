@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
@@ -68,6 +67,7 @@ namespace AssetConfigManager
 				targetProperty.SetValue(target, value, new object[] { });
 			}
 		}
+
 		private static void SetAssetConfig(object source, object target)
 		{
 			var configType = source.GetType();

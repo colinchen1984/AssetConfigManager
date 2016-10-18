@@ -50,7 +50,7 @@ namespace AssetConfigManager
 			EditorUtility.FocusProjectWindow();
 		}
 
-		void test()//OnDisable()
+		void OnDisable()
 		{
 			if (settingChanged)
 			{

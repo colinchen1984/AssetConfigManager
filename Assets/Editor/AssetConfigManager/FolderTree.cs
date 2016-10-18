@@ -48,8 +48,6 @@ namespace AssetConfigManager
 
 		private Dictionary<string, Folder> folderDic = new Dictionary<string, Folder>(1024);
 
-		private Folder root = null;
-
 		private Folder LoadFolder(DirectoryInfo folderInfo, string configFileName, Folder parent, string relatedPath)
 		{
 			var folderPath = folderInfo.FullName;
@@ -93,7 +91,7 @@ namespace AssetConfigManager
 		{
 			folderDic.Clear();
 			var directoryInfo = new DirectoryInfo(rootPath);
-			root = LoadFolder(directoryInfo, configFileName, null, "");
+			LoadFolder(directoryInfo, configFileName, null, "");
 		}
 
 		public Folder GetFolderInfo(string path)
