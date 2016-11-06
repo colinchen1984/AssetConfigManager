@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 099033f5f8f9e9b4991f37ab609f8bbc, type: 3}
+  m_Name: AssetConfig
+  m_EditorClassIdentifier: 
+  AudioConfig:
+    forceToMono: 0
+    loadInBackground: 0
+    preloadAudioData: 1
+  ModelConfig:
+    animationType: 0
+    meshCompression: 0
+    isReadable: 0
+    optimizeGameObjects: 1
+    importAnimation: 0
+    importNormals: 0
+    importTangents: 0
+    AnimationCompression: 1
+  TextureConfig:
+    filterMode: 1
+    androidTextureFormat: -1
+    iOSTextureFormat: -1
+    compressionQuality: 50
+    wrapMode: 0
+    isReadable: 0
+    mipmapEnabled: 0
+    allowsAlphaSplit: 1
+    maxTextureSize: 512
