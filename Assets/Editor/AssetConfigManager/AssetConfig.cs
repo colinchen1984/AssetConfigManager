@@ -96,7 +96,39 @@ namespace AssetConfigManager
 			SetAssetConfig(this, import);
 		}
 	}
-
+	//http://blog.uwa4d.com/archives/LoadingPerformance_Texture.html
+	//分辨率的影响
+	//1、纹理资源的分辨率对加载性能影响较大，分辨率越高，其加载越为耗时。
+	//	设备性能越差，其耗时差别越为明显；
+	//2、设备越好，加载效率确实越高。但是，对于硬件支持纹理（ETC1/PVRTC）来说,
+	//	中高端设备的加载效率差别已经很小，比如图中的红米Note2和三星S6设备，
+	//	差别已经很不明显
+	//纹理格式的影响
+	//1、纹理资源的格式对加载性能影响同样较大，
+	//	Android平台上，ETC1和ETC2的加载效率最高。
+	//	同样，iOS平台上，PVRTC 4BPP的加载效率最高。
+	//2、RGBA16格式纹理的加载效率同样很高，与RGBA32格式相比，
+	//	其加载效率与ETC1/PVRTC非常接近，并且设备越好，加载开销差别越不明显；
+	//3、RGBA32格式纹理的加载效率受硬件设备的性能影响较大，E
+	//	TC/PVRTC/RGBA16受硬件设备的影响较低。
+	//
+	//总结
+	//1、严格控制RGBA32和ARGB32纹理的使用，在保证视觉效果的前提下，
+	//	尽可能采用“够用就好”的原则，降低纹理资源的分辨率，
+	//	以及使用硬件支持的纹理格式。
+	//2、在硬件格式（ETC、PVRTC）无法满足视觉效果时，RGBA16格式是一种较为理想的
+	//	折中选择，既可以增加视觉效果，又可以保持较低的加载耗时。
+	//3、严格检查纹理资源的Mipmap功能，特别注意UI纹理的Mipmap是否开启。
+	//	在UWA测评过的项目中，有不少项目的UI纹理均开启了Mipmap功能，
+	//	不仅造成了内存占用上的浪费，同时也增加了不小的加载时间。
+	//4、ETC2对于支持OpenGL ES3.0的Android移动设备来说，是一个很好的处理半透明
+	//	的纹理格式。但是，如果你的游戏需要在大量OpenGL ES2.0的设备上进行运行，
+	//	那么我们不建议使用ETC2格式纹理。
+	//	因为不仅会造成大量的内存占用（ETC2转成RGBA32），
+	//	同时也增加一定的加载时间。
+	//	下图为测试2中所用的测试纹理在三星S3和S4设备上加载性能表现。
+	//	可以看出，在OpenGL ES2.0设备上，ETC2格式纹理的加载要明显高于ETC1格式，
+	//	且略高于RGBA16格式纹理。因此，建议研发团队在项目中谨慎使用ETC2格式纹理。
 	[Serializable]
 	[AssetConfigTarget(typeof(TextureImporter))]
 	public class TextureConfig : AssetConfigApply
@@ -121,6 +153,10 @@ namespace AssetConfigManager
 		}
 	}
 
+	//http://blog.uwa4d.com/archives/LoadingPerformance_Mesh.html
+	//1、在保证视觉效果的前提下，尽可能采用“够用就好”的原则，即降低网格资源的顶点数量和面片数量；
+	//2、研发团队对于顶点属性的使用需谨慎处理。通过以上分析可以看出，顶点属性越多，则内存占用越高，加载时间越长；
+	//3、如果在项目运行过程中对网格资源数据不进行读写操作（比如Morphing动画等），那么建议将Read/Write功能关闭，既可以提升加载效率，又可以大幅度降低内存占用。
 	[Serializable]
 	[AssetConfigTarget(typeof(ModelImporter))]
 	public class ModelConfig : AssetConfigApply
@@ -134,6 +170,7 @@ namespace AssetConfigManager
 		public bool importAnimation = false;
 		public bool importNormals = false;
 		public bool importTangents = false;
+		public ModelImporterAnimationCompression AnimationCompression = ModelImporterAnimationCompression.KeyframeReduction;
 	}
 
 	[Serializable]
