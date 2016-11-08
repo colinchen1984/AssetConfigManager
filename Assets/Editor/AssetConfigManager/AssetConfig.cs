@@ -157,6 +157,7 @@ namespace AssetConfigManager
 	//1、在保证视觉效果的前提下，尽可能采用“够用就好”的原则，即降低网格资源的顶点数量和面片数量；
 	//2、研发团队对于顶点属性的使用需谨慎处理。通过以上分析可以看出，顶点属性越多，则内存占用越高，加载时间越长；
 	//3、如果在项目运行过程中对网格资源数据不进行读写操作（比如Morphing动画等），那么建议将Read/Write功能关闭，既可以提升加载效率，又可以大幅度降低内存占用。
+	//PS: 如果是用于粒子系统的mesh,需要开启read/write,不然会导致崩溃
 	[Serializable]
 	[AssetConfigTarget(typeof(ModelImporter))]
 	public class ModelConfig : AssetConfigApply
