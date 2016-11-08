@@ -36,7 +36,7 @@ namespace AssetConfigManager
 				return;
 			}
 
-			if (false == targetField.FieldType.IsPrimitive && false == targetField.FieldType.IsEnum  && targetField.FieldType != typeof(string))
+			if (false == targetField.FieldType.IsPrimitive && false == targetField.FieldType.IsEnum && targetField.FieldType != typeof(string))
 			{
 				var sourceValue = sourceField.GetValue(source);
 				var targetValue = targetField.GetValue(target);
@@ -147,7 +147,7 @@ namespace AssetConfigManager
 		public override void SetAssetConfig(AssetImporter import)
 		{
 			base.SetAssetConfig(import);
-			var ti = (TextureImporter) import;
+			var ti = (TextureImporter)import;
 			ti.SetPlatformTextureSettings("iPhone", maxTextureSize, iOSTextureFormat, compressionQuality, allowsAlphaSplit);
 			ti.SetPlatformTextureSettings("Android", maxTextureSize, androidTextureFormat, compressionQuality, allowsAlphaSplit);
 		}
@@ -168,8 +168,9 @@ namespace AssetConfigManager
 		[InspectorShowingName("optimize Game Objects")]
 		public bool optimizeGameObjects = true;
 		public bool importAnimation = false;
-		public bool importNormals = false;
-		public bool importTangents = false;
+		public bool importMaterials = false;
+		public ModelImporterNormals importNormals = ModelImporterNormals.None;
+		public ModelImporterTangents importTangents = ModelImporterTangents.None;
 		public ModelImporterAnimationCompression AnimationCompression = ModelImporterAnimationCompression.KeyframeReduction;
 	}
 
