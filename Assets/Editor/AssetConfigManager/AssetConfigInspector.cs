@@ -28,7 +28,7 @@ namespace AssetConfigManager
 				EditorUtility.DisplayDialog("Config is there for you", "Can't have to configs in one folder", "OK", "Cancel");
 				return;
 			}
-			var tree = AssetImportPostProcessor.BuildFolderTree();
+			var tree = AssetImportPostProcessor.tree;
 			var parentConfig = tree.GetAssetConfig(selectionpath, true);
 			AssetConfig newRule = null;
 			if (null == parentConfig)
@@ -42,7 +42,7 @@ namespace AssetConfigManager
 			else
 			{
 				var parentPath = AssetDatabase.GetAssetPath(parentConfig);
-				AssetDatabase.CopyAsset(parentPath, newRuleFileName);
+				File.Copy(parentPath, newRuleFileName);
 				AssetDatabase.Refresh();
 				newRule = AssetDatabase.LoadAssetAtPath<AssetConfig>(newRuleFileName);
 			}
@@ -89,7 +89,6 @@ namespace AssetConfigManager
 	
 		private void ApplyAssetConfig(AssetConfig config)
 		{
-			AssetImportPostProcessor.ApplyConfig(config);
 			EditorUtility.SetDirty(config);
 			AssetDatabase.SaveAssets();
 		}

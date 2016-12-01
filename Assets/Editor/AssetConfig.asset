@@ -8,7 +8,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 099033f5f8f9e9b4991f37ab609f8bbc, type: 3}
+  m_Script: {fileID: 11500000, guid: 6147a01c4a1a07d4ca09574d0bd3d0a7, type: 3}
   m_Name: AssetConfig
   m_EditorClassIdentifier: 
   AudioConfig:
@@ -16,21 +16,22 @@ MonoBehaviour:
     loadInBackground: 0
     preloadAudioData: 1
   ModelConfig:
-    animationType: 0
+    animationType: 1
     meshCompression: 0
     isReadable: 0
     optimizeGameObjects: 1
     importAnimation: 0
+    importMaterials: 0
     importNormals: 0
-    importTangents: 0
-    AnimationCompression: 1
+    importTangents: 2
+    AnimationCompression: 0
   TextureConfig:
     filterMode: 1
-    androidTextureFormat: -1
+    androidTextureFormat: 36
     iOSTextureFormat: -1
     compressionQuality: 50
     wrapMode: 0
-    isReadable: 0
-    mipmapEnabled: 0
-    allowsAlphaSplit: 1
+    isReadable: 1
+    mipmapEnabled: 1
+    allowsAlphaSplit: 0
     maxTextureSize: 512
