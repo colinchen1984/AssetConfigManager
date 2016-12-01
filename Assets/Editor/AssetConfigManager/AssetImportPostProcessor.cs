@@ -144,8 +144,7 @@ namespace AssetConfigManager
 					continue;
 				}
 				var configField = (AssetConfigApply)field.GetValue(config);
-				configField.SetAssetConfig(import);
-				ret = true;
+				ret = configField.SetAssetConfig(import);
 				break;
 			}
 			return ret;

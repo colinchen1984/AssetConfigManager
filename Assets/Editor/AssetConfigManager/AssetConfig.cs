@@ -29,47 +29,62 @@ namespace AssetConfigManager
 
 	public abstract class AssetConfigApply
 	{
-		private static void SetValue(object source, FieldInfo sourceField, object target, FieldInfo targetField)
+		private static bool SetValue(object source, FieldInfo sourceField, object target, FieldInfo targetField)
 		{
+			var ret = false;
 			if (targetField.FieldType != sourceField.FieldType)
 			{
-				return;
+				return ret;
 			}
 
 			if (false == targetField.FieldType.IsPrimitive && false == targetField.FieldType.IsEnum && targetField.FieldType != typeof(string))
 			{
 				var sourceValue = sourceField.GetValue(source);
 				var targetValue = targetField.GetValue(target);
-				SetAssetConfig(sourceValue, targetValue);
+				ret = SetAssetConfig(sourceValue, targetValue);
 			}
 			else
 			{
-				var value = sourceField.GetValue(source);
-				targetField.SetValue(target, value);
+				var sourceValue = sourceField.GetValue(source);
+				var targetValue = targetField.GetValue(target);
+				if(false == targetValue.Equals(sourceValue))
+				{
+					ret = true;
+					targetField.SetValue(target, sourceValue);
+				}
 			}
+			return true;
 		}
 
-		private static void SetValue(object source, FieldInfo sourceField, object target, PropertyInfo targetProperty)
+		private static bool SetValue(object source, FieldInfo sourceField, object target, PropertyInfo targetProperty)
 		{
+			var ret = false;
 			if (targetProperty.PropertyType != sourceField.FieldType)
 			{
-				return;
+				return ret;
 			}
 			if (false == targetProperty.PropertyType.IsPrimitive && false == targetProperty.PropertyType.IsEnum && targetProperty.PropertyType != typeof(string))
 			{
 				var sourceValue = sourceField.GetValue(source);
 				var targetValue = targetProperty.GetValue(target, new object[] { });
-				SetAssetConfig(sourceValue, targetValue);
+				ret = SetAssetConfig(sourceValue, targetValue);
 			}
 			else
 			{
-				var value = sourceField.GetValue(source);
-				targetProperty.SetValue(target, value, new object[] { });
+				var sourceValue = sourceField.GetValue(source);
+				var targetValue = targetProperty.GetValue(target, new object[] { });
+				if(false == sourceValue.Equals(targetValue))
+				{
+					ret = true;
+					targetProperty.SetValue(target, sourceValue, new object[] { });
+				}
 			}
+			return ret;
 		}
 
-		private static void SetAssetConfig(object source, object target)
+		private static bool SetAssetConfig(object source, object target)
 		{
+			var ret = false;
 			var configType = source.GetType();
 			var fields = configType.GetFields(BindingFlags.Public | BindingFlags.Instance);
 			var importType = target.GetType();
@@ -78,22 +93,23 @@ namespace AssetConfigManager
 				var targetProperty = importType.GetProperty(field.Name);
 				if (null != targetProperty)
 				{
-					SetValue(source, field, target, targetProperty);
+					ret = SetValue(source, field, target, targetProperty) || ret;
 					continue;
 				}
 				var targetField = importType.GetField(field.Name);
 				if (null != targetField)
 				{
-					SetValue(source, field, target, targetField);
+					ret = SetValue(source, field, target, targetField) || ret;
 					continue;
 				}
 
 			}
+			return ret;
 		}
 
-		public virtual void SetAssetConfig(AssetImporter import)
+		public virtual bool SetAssetConfig(AssetImporter import)
 		{
-			SetAssetConfig(this, import);
+			return SetAssetConfig(this, import);
 		}
 	}
 	//http://blog.uwa4d.com/archives/LoadingPerformance_Texture.html
@@ -144,12 +160,19 @@ namespace AssetConfigManager
 		public bool allowsAlphaSplit = true;
 		public int maxTextureSize = 512;
 
-		public override void SetAssetConfig(AssetImporter import)
+		public override bool SetAssetConfig(AssetImporter import)
 		{
-			base.SetAssetConfig(import);
+			var ret = base.SetAssetConfig(import);
 			var ti = (TextureImporter)import;
+			int maxTextureSizeSource = 0;
+			TextureImporterFormat formartSource = TextureImporterFormat.Alpha8;
+			ti.GetPlatformTextureSettings("iPhone", out maxTextureSizeSource, out formartSource);
+			ret = ret || maxTextureSizeSource != maxTextureSize || formartSource != iOSTextureFormat;
+			ti.GetPlatformTextureSettings("Android", out maxTextureSizeSource, out formartSource);
+			ret = ret || maxTextureSizeSource != maxTextureSize || formartSource != androidTextureFormat;
 			ti.SetPlatformTextureSettings("iPhone", maxTextureSize, iOSTextureFormat, compressionQuality, allowsAlphaSplit);
 			ti.SetPlatformTextureSettings("Android", maxTextureSize, androidTextureFormat, compressionQuality, allowsAlphaSplit);
+			return ret;
 		}
 	}
 

@@ -43,6 +43,7 @@ namespace AssetConfigManager
 			{
 				var parentPath = AssetDatabase.GetAssetPath(parentConfig);
 				File.Copy(parentPath, newRuleFileName);
+				AssetDatabase.ImportAsset(newRuleFileName);
 				AssetDatabase.Refresh();
 				newRule = AssetDatabase.LoadAssetAtPath<AssetConfig>(newRuleFileName);
 			}
