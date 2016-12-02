@@ -75,7 +75,7 @@ namespace AssetConfigManager
 			var t = (AssetConfig)target;
 			EditorGUILayout.BeginVertical();
 			EditorGUI.BeginChangeCheck();
-			ObjectToInspector.ShowObjectInstance(t, "");
+			ObjectToInspector.ShowObjectInstance(null, t, "");
 			settingChanged = settingChanged || EditorGUI.EndChangeCheck();
 			if (settingChanged)
 			{

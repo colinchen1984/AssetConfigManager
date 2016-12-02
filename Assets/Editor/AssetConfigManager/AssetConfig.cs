@@ -27,6 +27,14 @@ namespace AssetConfigManager
 		}
 	}
 
+	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+	public class ForceShowInInspector : Attribute
+	{
+		public ForceShowInInspector()
+		{
+		}
+	}
+
 	public abstract class AssetConfigApply
 	{
 		private static bool SetValue(object source, FieldInfo sourceField, object target, FieldInfo targetField)
@@ -155,6 +163,7 @@ namespace AssetConfigManager
 		public TextureWrapMode wrapMode = TextureWrapMode.Repeat;
 
 		[InspectorShowingName("Enable texture read/write")]
+		[Tooltip("如果需要开启,请和程序确认,开启后导致纹理占用的内存翻倍")]
 		public bool isReadable = false;
 		public bool mipmapEnabled = false;
 		public bool allowsAlphaSplit = true;
@@ -185,14 +194,19 @@ namespace AssetConfigManager
 	[AssetConfigTarget(typeof(ModelImporter))]
 	public class ModelConfig : AssetConfigApply
 	{
-		public ModelImporterAnimationType animationType = ModelImporterAnimationType.None;
-		public ModelImporterMeshCompression meshCompression = ModelImporterMeshCompression.Off;
+
 		[InspectorShowingName("Enable Mesh read/write")]
+		[Tooltip("用于例子系统的Mesh需要开启,其他需要开启,请和程序确认,开启后导致Mesh占用的内存翻倍")]
 		public bool isReadable = false;
 		[InspectorShowingName("optimize Game Objects")]
+		[Tooltip("用于新的MacAnimation系统,Unity会自动计算并删除不需要的骨骼,开启后,对于挂载点,需要额外处理")]
 		public bool optimizeGameObjects = true;
 		public bool importAnimation = false;
+		public ModelImporterAnimationType animationType = ModelImporterAnimationType.None;
+		public ModelImporterMeshCompression meshCompression = ModelImporterMeshCompression.Off;
+		[Tooltip("建议开启,不然会导致打包的时候,引入默认的材质")]
 		public bool importMaterials = false;
+		public ModelImporterMaterialName materialName = ModelImporterMaterialName.BasedOnModelNameAndMaterialName;
 		public ModelImporterNormals importNormals = ModelImporterNormals.None;
 		public ModelImporterTangents importTangents = ModelImporterTangents.None;
 		public ModelImporterAnimationCompression AnimationCompression = ModelImporterAnimationCompression.KeyframeReduction;
@@ -202,7 +216,7 @@ namespace AssetConfigManager
 	[AssetConfigTarget(typeof(AudioImporter))]
 	public class AudioConfig : AssetConfigApply
 	{
-		[InspectorShowingName("")]
+		[ForceShowInInspector]
 		public AudioImporterSampleSettings defaultSampleSettings = default(AudioImporterSampleSettings);
 		public bool forceToMono;
 		public bool loadInBackground;

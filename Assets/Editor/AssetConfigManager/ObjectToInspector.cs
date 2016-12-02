@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
+using UnityEngine;
 
 namespace AssetConfigManager
 {
@@ -31,6 +32,17 @@ namespace AssetConfigManager
 			return name;
 		}
 
+		private static string GetShowingTip(FieldInfo fieldInfo)
+		{
+			var tip = string.Empty;
+			var nameAttr = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), false);
+			if (nameAttr.Length > 0)
+			{
+				tip = ((TooltipAttribute)nameAttr[0]).tooltip;
+			}
+			return tip;
+		}
+
 		private static void ShowError(FieldInfo fieldInfo, object targetObject)
 		{
 			new Exception(string.Format("Wrong field type {0}\t{1}", fieldInfo.FieldType.Name, fieldInfo.Name));
@@ -39,8 +51,10 @@ namespace AssetConfigManager
 		private static void ShowBoolValue(FieldInfo fieldInfo, object targetObject)
 		{
 			var name = GetShowingName(fieldInfo);
+			var tip = GetShowingTip(fieldInfo);
+			var content = new GUIContent(name, tip);
 			bool value = GetValue<bool>(fieldInfo, targetObject);
-			var newValue = EditorGUILayout.Toggle(name, value);
+			var newValue = EditorGUILayout.Toggle(content, value);
 			if (newValue != value)
 			{
 				fieldInfo.SetValue(targetObject, newValue);
@@ -50,9 +64,11 @@ namespace AssetConfigManager
 		private static void ShowIntValue(FieldInfo fieldInfo, object targetObject)
 		{
 			var name = GetShowingName(fieldInfo);
+			var tip = GetShowingTip(fieldInfo);
+			var content = new GUIContent(name, tip);
+			EditorGUILayout.LabelField(content);
 
 			var value = GetValue<int>(fieldInfo, targetObject);
-			EditorGUILayout.LabelField(name);
 			var newValue = EditorGUILayout.IntField(value);
 			if (newValue != value)
 			{
@@ -63,9 +79,11 @@ namespace AssetConfigManager
 		private static void ShowFloatValue(FieldInfo fieldInfo, object targetObject)
 		{
 			var name = GetShowingName(fieldInfo);
+			var tip = GetShowingTip(fieldInfo);
+			var content = new GUIContent(name, tip);
+			EditorGUILayout.LabelField(content);
 
 			var value = GetValue<float>(fieldInfo, targetObject);
-			EditorGUILayout.LabelField(name);
 			var newValue = EditorGUILayout.FloatField(value);
 			if (false == newValue.Equals(value))
 			{
@@ -76,9 +94,10 @@ namespace AssetConfigManager
 		private static void ShowEnumValue(FieldInfo fieldInfo, object targetObject)
 		{
 			var name = GetShowingName(fieldInfo);
-
+			var tip = GetShowingTip(fieldInfo);
+			var content = new GUIContent(name, tip);
+			EditorGUILayout.LabelField(content);
 			var value = GetValue<Enum>(fieldInfo, targetObject);
-			EditorGUILayout.LabelField(name);
 			var newValue = EditorGUILayout.EnumPopup(value);
 			if (false == newValue.Equals(value))
 			{
@@ -86,19 +105,37 @@ namespace AssetConfigManager
 			}
 		}
 
-		public static void ShowObjectInstance(object targetObject, string objectName)
+		public static void ShowObjectInstance(FieldInfo objFieldInfo, object targetObject, string objectName)
 		{
 			var serilizeable = targetObject.GetType().GetCustomAttributes(typeof(SerializableAttribute), false);
 			var allFields = targetObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
 			var finalFields = new List<FieldInfo>(allFields.Length);
 			if (serilizeable.Length == 0)
 			{
-				foreach (var fieldInfo in allFields)
+				if (null != objFieldInfo)
 				{
-					var a = fieldInfo.GetCustomAttributes(typeof(SerializableAttribute), false);
-					if (a.Length > 0)
+					serilizeable = objFieldInfo.GetCustomAttributes(typeof(ForceShowInInspector), false);
+					if (serilizeable.Length > 0)
 					{
-						finalFields.Add(fieldInfo);
+						foreach (var fieldInfo in allFields)
+						{
+							var a = fieldInfo.GetCustomAttributes(typeof(NonSerializedAttribute), false);
+							if (a.Length == 0)
+							{
+								finalFields.Add(fieldInfo);
+							}
+						}
+					}
+				}
+				else
+				{
+					foreach (var fieldInfo in allFields)
+					{
+						var a = fieldInfo.GetCustomAttributes(typeof(SerializableAttribute), false);
+						if (a.Length > 0)
+						{
+							finalFields.Add(fieldInfo);
+						}
 					}
 				}
 			}
@@ -123,8 +160,9 @@ namespace AssetConfigManager
 			{
 				if (false == field.FieldType.IsPrimitive && false == field.FieldType.IsEnum)
 				{
-					var newTarget = field.GetValue(targetObject);
-					ShowObjectInstance(newTarget, GetShowingName(field));
+					var value = field.GetValue(targetObject);
+					ShowObjectInstance(field, value, GetShowingName(field));
+					field.SetValue(targetObject, value);
 				}
 				else
 				{
