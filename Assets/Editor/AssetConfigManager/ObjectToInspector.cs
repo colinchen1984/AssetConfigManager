@@ -108,27 +108,16 @@ namespace AssetConfigManager
 		public static void ShowObjectInstance(FieldInfo objFieldInfo, object targetObject, string objectName)
 		{
 			var serilizeable = targetObject.GetType().GetCustomAttributes(typeof(SerializableAttribute), false);
+			if (serilizeable.Length == 0 && null != objFieldInfo)
+			{
+				serilizeable = objFieldInfo.GetCustomAttributes(typeof(ForceShowInInspector), false);
+			}
+
 			var allFields = targetObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
 			var finalFields = new List<FieldInfo>(allFields.Length);
 			if (serilizeable.Length == 0)
 			{
-				if (null != objFieldInfo)
-				{
-					serilizeable = objFieldInfo.GetCustomAttributes(typeof(ForceShowInInspector), false);
-					if (serilizeable.Length > 0)
-					{
-						foreach (var fieldInfo in allFields)
-						{
-							var a = fieldInfo.GetCustomAttributes(typeof(NonSerializedAttribute), false);
-							if (a.Length == 0)
-							{
-								finalFields.Add(fieldInfo);
-							}
-						}
-					}
-				}
-				else
-				{
+				
 					foreach (var fieldInfo in allFields)
 					{
 						var a = fieldInfo.GetCustomAttributes(typeof(SerializableAttribute), false);
@@ -137,7 +126,6 @@ namespace AssetConfigManager
 							finalFields.Add(fieldInfo);
 						}
 					}
-				}
 			}
 			else
 			{

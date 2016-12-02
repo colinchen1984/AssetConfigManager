@@ -59,7 +59,6 @@ namespace AssetConfigManager
 				if (EditorUtility.DisplayDialog("Unsaved Settings", "Unsaved AssetRule Changes", "Apply", "Revert"))
 				{
 					ApplyAssetConfig((AssetConfig) target);
-
 				}
 				else
 				{
