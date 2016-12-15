@@ -43,6 +43,30 @@ namespace AssetConfigManager
 			return tip;
 		}
 
+		private static float SelectRange(FieldInfo field, float value) 
+		{
+			var ranges = field.GetCustomAttributes(typeof(RangeAttribute), false);
+			if (null == ranges || ranges.Length == 0)
+			{
+				return value;
+			}
+			var range = (RangeAttribute)ranges[0];
+			var newValue = Mathf.Clamp(value, range.min, range.max);
+			return newValue;
+		}
+
+		private static int SelectRange(FieldInfo field, int value)
+		{
+			var ranges = field.GetCustomAttributes(typeof(RangeAttribute), false);
+			if (null == ranges || ranges.Length == 0)
+			{
+				return value;
+			}
+			var range = (RangeAttribute)ranges[0];
+			var newValue = (int)Mathf.Clamp((float)value, range.min, range.max);
+			return newValue;
+		}
+
 		private static void ShowError(FieldInfo fieldInfo, object targetObject)
 		{
 			new Exception(string.Format("Wrong field type {0}\t{1}", fieldInfo.FieldType.Name, fieldInfo.Name));
@@ -72,6 +96,7 @@ namespace AssetConfigManager
 			var newValue = EditorGUILayout.IntField(value);
 			if (newValue != value)
 			{
+				newValue = SelectRange(fieldInfo, newValue);
 				fieldInfo.SetValue(targetObject, newValue);
 			}
 		}
@@ -87,6 +112,7 @@ namespace AssetConfigManager
 			var newValue = EditorGUILayout.FloatField(value);
 			if (false == newValue.Equals(value))
 			{
+				newValue = SelectRange(fieldInfo, newValue);
 				fieldInfo.SetValue(targetObject, newValue);
 			}
 		}

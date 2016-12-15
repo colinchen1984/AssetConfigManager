@@ -168,6 +168,9 @@ namespace AssetConfigManager
 		public bool mipmapEnabled = false;
 		public bool allowsAlphaSplit = true;
 		public int maxTextureSize = 512;
+		[Tooltip("1关闭，9最大")]
+		[Range(1f, 9f)]
+		public int anisoLevel = 1;
 
 		public override bool SetAssetConfig(AssetImporter import)
 		{
